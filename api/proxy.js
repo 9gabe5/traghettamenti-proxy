@@ -1,7 +1,7 @@
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET');
-  
+
   const { numero } = req.query;
   if (!numero) return res.status(400).json({ error: 'Numero treno mancante' });
 
@@ -25,14 +25,14 @@ export default async function handler(req, res) {
       `http://www.viaggiatreno.it/infomobilita/resteasy/viaggiatreno/andamentoTreno/${codOrigine}/${numero}/${timestamp}`
     );
     if (andamentoRes.status === 204) return res.status(404).json({ error: 'Dati non ancora disponibili' });
-    
+
     const data = await andamentoRes.json();
 
     res.json({
       ritardo: data.ritardo ?? 0,
       stazioneUltima: data.stazioneUltimoRilevamento ?? '--',
       oraUltima: data.oraUltimoRilevamento ?? null,
-      binario: data.binarioProgrammatoPartenzaDescrizione ?? null,
+      binario: data.binarioProgrammatoArrivoDescrizione ?? data.binarioEffettivoArrivoDescrizione ?? null,
       cancellato: data.provvedimento === 1,
       inStazione: data.inStazione ?? false
     });
